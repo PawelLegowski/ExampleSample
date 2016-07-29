@@ -18,43 +18,57 @@ class PetHungryException : public exception
 {
 	virtual const char* what() const throw()
 	{
-		return "Piesek jest glodny";
+		return "Zwierzak jest glodny";
 	}
 } petHungryException;
 
-class Zwierze
+class PetIsNotMyFriend : public exception
+{
+	virtual const char* what() const throw()
+	{
+		return "sory, to nie moj przyjaciel";
+	}
+} petIsNotMyFriend;
+
+class Animal
 {
 private:
 	int UID;
 	queue<std::string> foodBuffer;
-	float dystans;
+	string name;
 protected:
+	float distanceTraveled;
 public:
-	string imie;
-	Zwierze(string aImie)
+	Animal(const string& aName)
 	{
-		imie = aImie;
+		name = aName;
 		UID = NEXT_ID;
+		distanceTraveled = 0;
 		printf("Masz nowe zwierze o UID %d\n", UID);
 	}
 
-	virtual ~Zwierze()
+	virtual ~Animal()
 	{
 		printf("Zabiles zwierze o UID %d\n", UID);
 	}
 
+	const string getName()
+	{
+		return name;
+	}
+
 	template<typename T>
-	void biegnij(T aDystans)
+	void travel(T aDystans)
 	{
-		dystans += aDystans;
+		distanceTraveled += aDystans;
 	}
 
-	void nakarm(std::string papu)
+	void feed(const string& food)
 	{
-		foodBuffer.push(papu);
+		foodBuffer.push(food);
 	}
 
-	string kupka()
+	string poo()
 	{
 		if (foodBuffer.size() == 0)
 			throw petHungryException;
@@ -64,99 +78,134 @@ public:
 		return ans;
 	}
 
-	string nazwa()
+	const string getType()
 	{
 		string subans = typeid(*this).name();
 		return subans.substr(6);
 	}
 
-	virtual string dajGlos() = 0;
+	virtual const string growl() = 0;
 };
 
-class Piesek : public Zwierze
+class Dog : public Animal
 {
+	friend class Human;
 public:
-	Piesek(string aImie) : Zwierze(aImie)
+	Dog(const string& aImie) : Animal(aImie)
 	{
 		cout << "To piesek " + aImie + "!\n\n";
 	}
 
-	virtual string dajGlos()
+	virtual const string growl()
 	{
 		return "hau hau";
 	}
 };
 
-class Kotek : public Zwierze
+class Cat : public Animal
 {
 public:
-	Kotek(string aImie) : Zwierze(aImie)
+	Cat(const string& aName) : Animal(aName)
 	{
-		cout << "To kotek " + aImie + "!\n\n";
+		cout << "To kotek " + aName + "!\n\n";
 	}
 
-	virtual string dajGlos()
+	virtual const string growl()
 	{
 		return "mial";
 	}
 };
 
+class Human
+{
+	Animal* pet;
+public:
+	void setPet(Animal* aPet)
+	{
+		pet = aPet;
+	}
+
+	float getPetDistanceTraveled()
+	{
+		if (Dog* aDog = dynamic_cast<Dog*>(pet))
+			return aDog->distanceTraveled;
+		else
+			throw petIsNotMyFriend;
+	}
+};
+
 int main()
 {
-	Zwierze* zwierzakistat[2];
-	Zwierze* zwierz;
-	Zwierze** zwierzakidyn;
-	zwierzakidyn = new Zwierze*[2];
-	zwierzakidyn[0] = new Piesek("Leszek");
-	zwierzakidyn[1] = new Kotek("Filemon");
+	Human czarek;
+	Animal* zwierzakistat[2];
+	Animal* zwierz;
+	Animal** zwierzakidyn;
+	zwierzakidyn = new Animal*[2];
+	zwierzakidyn[0] = new Dog("Leszek");
+	zwierzakidyn[1] = new Cat("Filemon");
 
 	cout << "\n";
 
 	for (int i = 0; i < 2; i++)
-		cout << zwierzakidyn[i]->nazwa() << " robi " << zwierzakidyn[i]->dajGlos() << endl;
+		cout << zwierzakidyn[i]->getType() << " robi " << zwierzakidyn[i]->growl() << endl;
 
 	cout << "\n";
 
-	cout << "Karmie " + zwierzakidyn[0]->nazwa() + " mieskiem!" << endl;
-	zwierzakidyn[0]->nakarm("miesko");
+	cout << "Karmie " + zwierzakidyn[0]->getType() + " mieskiem!" << endl;
+	zwierzakidyn[0]->feed("miesko");
 
 	while (true)
 	{
 		try
 		{
-			cout << "Piesek wyproznil " + zwierzakidyn[0]->kupka() << endl;
+			cout << "Piesek wyproznil " + zwierzakidyn[0]->poo() << endl;
 		}
 		catch (exception& e)
 		{
-			cout << e.what() << endl;
+			cout << "Blad! " << e.what() << endl;
 			break;
 		}
-
 	}
 
-	cout << "\n";
+	cout << "\nSPACEREK\n";	
+	zwierzakidyn[0]->travel(20);
+	zwierzakidyn[1]->travel(0.7f);
+	
+	Animal* aZwierzaczek;
 
 	for (int i = 0; i < 2; i++)
-		printf("%d : %s %s\n", i, zwierzakidyn[i]->nazwa().c_str(), zwierzakidyn[i]->imie.c_str());
+	{
+		aZwierzaczek = zwierzakidyn[i];
+		czarek.setPet(aZwierzaczek);
+		try
+		{
+			printf("%s przebiegl %f\n\n", aZwierzaczek->getName().c_str(), czarek.getPetDistanceTraveled());
+		}
+		catch (exception& e)
+		{
+			printf("Nie wiem ile przebiegl %s\n", aZwierzaczek->getName().c_str());
+			cout << "Blad! " << e.what() << endl << endl;
+		}
+	}
+
+	for (int i = 0; i < 2; i++)
+		printf("%d : %s %s\n", i, zwierzakidyn[i]->getType().c_str(), zwierzakidyn[i]->getName().c_str());
 
 	cout << "\n Sortowanko z lambda po imionach\n\n";
 
-
 	sort(zwierzakidyn, zwierzakidyn + 2,
-		[](const Zwierze* a, const Zwierze* b) -> bool {return a->imie < b->imie; }
+		[](Animal* a, Animal* b) -> bool {return a->getName() < b->getName(); }
 	);
 
 	for (int i = 0; i < 2; i++)
-		cout << i << " : " << zwierzakidyn[i]->nazwa() << " " << zwierzakidyn[i]->imie << endl;
+		cout << i << " : " << zwierzakidyn[i]->getType() << " " << zwierzakidyn[i]->getName() << endl;
 	cout << endl;
 
 	for (int i = 0; i < 2; i++)
 		delete zwierzakidyn[i];
 	delete[] zwierzakidyn;
 
-
-	cout << "\n";
-	cout << "Dziekuje za pokaz";
+	cout << "\nDziekuje za pokaz\n\n";
 
 	system("pause");
 	return 0;
