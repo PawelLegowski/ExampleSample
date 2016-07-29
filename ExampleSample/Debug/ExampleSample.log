@@ -1,0 +1,5 @@
+﻿  stdafx.cpp
+  ExampleSample.cpp
+c:\users\kalesony\documents\visual studio 2015\projects\examplesample\examplesample\examplesample.cpp(107): warning C4101: 'zwierz': unreferenced local variable
+c:\users\kalesony\documents\visual studio 2015\projects\examplesample\examplesample\examplesample.cpp(106): warning C4101: 'zwierzakistat': unreferenced local variable
+  ExampleSample.vcxproj -> c:\users\kalesony\documents\visual studio 2015\Projects\ExampleSample\Debug\ExampleSample.exe
