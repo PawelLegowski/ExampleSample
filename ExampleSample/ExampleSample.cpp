@@ -138,7 +138,6 @@ int main()
 {
 	Human czarek;
 	Animal* zwierzakistat[2];
-	Animal* zwierz;
 	Animal** zwierzakidyn;
 	zwierzakidyn = new Animal*[2];
 	zwierzakidyn[0] = new Dog("Leszek");
