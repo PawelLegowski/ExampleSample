@@ -49,7 +49,7 @@ public:
 
 	virtual ~Animal()
 	{
-		printf("Zabiles zwierze o UID %d\n", UID);
+		printf("Zginelo zwierze o UID %d\n", UID);
 	}
 
 	const string getName()
@@ -112,7 +112,7 @@ public:
 
 	virtual const string growl()
 	{
-		return "mial";
+		return "miau";
 	}
 };
 
